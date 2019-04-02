@@ -183,8 +183,7 @@ def SJF_scheduling(process_list, alpha):
             terminate = True
         if(terminate):
             break
-        ## take the ready process from the process_list
-        put_process_ready_queue_with_predict(SJF_processes,ready_process_queue,current_time,guess_actual_dict,alpha)
+       
         if ready_process_queue.empty():
             current_time = SJF_processes[0].arrive_time
             ready_process_queue.put(SJF_processes[0])
@@ -194,8 +193,12 @@ def SJF_scheduling(process_list, alpha):
         
         waiting_time = waiting_time + current_time - current_process.arrive_time
         current_time = current_time + current_process.burst_time
-
+	
+	## take the ready process from the process_list
+        ## use the old information to fetch the ready list, then update the predict information
+        put_process_ready_queue_with_predict(SJF_processes,ready_process_queue,current_time,guess_actual_dict,alpha)
         ##update the predict information
+
         guess_actual = guess_actual_dict.get(current_process.id)
         guess_actual[1] =  current_process.burst_time
         guess_actual[0] =  guess_actual[0] * (1-alpha) + alpha * guess_actual[1]
@@ -227,6 +230,7 @@ def main(argv):
     print ("printing input ----")
     for process in process_list:
         print (process)
+   
     print ("simulating FCFS ----")
     FCFS_schedule, FCFS_avg_waiting_time =  FCFS_scheduling(process_list)
     write_output('FCFS.txt', FCFS_schedule, FCFS_avg_waiting_time )
@@ -242,7 +246,7 @@ def main(argv):
     
     print ("simulating SJF ----")    #optimal alpha is 0.0
     
-    SJF_schedule, SJF_avg_waiting_time =  SJF_scheduling(process_list, alpha = 0.5)
+    SJF_schedule, SJF_avg_waiting_time =  SJF_scheduling(process_list,alpha = 0.5)
     write_output('SJF.txt', SJF_schedule, SJF_avg_waiting_time )
    
 if __name__ == '__main__':
